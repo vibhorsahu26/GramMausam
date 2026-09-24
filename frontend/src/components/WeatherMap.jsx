@@ -79,9 +79,18 @@ const panchayatData = [
   },
 ];
 
-const layers = ["Rainfall", "Temperature", "Humidity", "Wind", "Risk"];
+const layers = [
+  "Rainfall",
+  "Temperature",
+  "Humidity",
+  "Wind",
+  "Risk",
+];
 
-export default function WeatherMap({ selectedPanchayat }) {
+export default function WeatherMap({
+  selectedPanchayat,
+  onPanchayatSelect,
+}) {
   const [activeLayer, setActiveLayer] = useState("Rainfall");
 
   return (
@@ -93,14 +102,15 @@ export default function WeatherMap({ selectedPanchayat }) {
           </h2>
 
           <p className="mt-0.5 text-[10px] text-slate-400">
-            Localized weather visualization
+            Fine-resolution weather visualization
           </p>
         </div>
 
-        <div className="flex gap-1 overflow-x-auto">
+        <div className="flex max-w-full gap-1 overflow-x-auto">
           {layers.map((layer) => (
             <button
               key={layer}
+              type="button"
               onClick={() => setActiveLayer(layer)}
               className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-[10px] font-medium transition ${
                 activeLayer === layer
@@ -114,7 +124,7 @@ export default function WeatherMap({ selectedPanchayat }) {
         </div>
       </div>
 
-      <div className="h-[420px] p-2 sm:h-[450px]">
+      <div className="h-[420px] p-2 sm:h-[500px]">
         <MapContainer
           center={center}
           zoom={11}
@@ -128,15 +138,27 @@ export default function WeatherMap({ selectedPanchayat }) {
           />
 
           {panchayatData.map((item) => {
-            const isSelected = item.name === selectedPanchayat;
-            const fillColor = getLayerColor(activeLayer, item);
+            const isSelected =
+              item.name === selectedPanchayat;
+
+            const fillColor = getLayerColor(
+              activeLayer,
+              item
+            );
 
             return (
               <Rectangle
                 key={item.name}
                 bounds={item.bounds}
+                eventHandlers={{
+                  click: () => {
+                    onPanchayatSelect?.(item.name);
+                  },
+                }}
                 pathOptions={{
-                  color: isSelected ? "#0f172a" : "#ffffff",
+                  color: isSelected
+                    ? "#0f172a"
+                    : "#ffffff",
                   weight: isSelected ? 3 : 1,
                   fillColor,
                   fillOpacity: isSelected ? 0.72 : 0.48,
@@ -149,6 +171,12 @@ export default function WeatherMap({ selectedPanchayat }) {
                     <br />
 
                     {getLayerValue(activeLayer, item)}
+
+                    <br />
+
+                    <span>
+                      {item.risk} risk
+                    </span>
                   </div>
                 </Tooltip>
               </Rectangle>
@@ -252,15 +280,19 @@ function MapLegend({ activeLayer }) {
           </p>
 
           <div className="mt-2 flex items-center gap-1">
-            {["#2563eb", "#22c55e", "#facc15", "#f97316", "#dc2626"].map(
-              (color) => (
-                <span
-                  key={color}
-                  className="h-2.5 w-8 rounded-full"
-                  style={{ backgroundColor: color }}
-                />
-              )
-            )}
+            {[
+              "#2563eb",
+              "#22c55e",
+              "#facc15",
+              "#f97316",
+              "#dc2626",
+            ].map((color) => (
+              <span
+                key={color}
+                className="h-2.5 w-8 rounded-full"
+                style={{ backgroundColor: color }}
+              />
+            ))}
           </div>
 
           <div className="mt-1 flex justify-between text-[8px] text-slate-400">

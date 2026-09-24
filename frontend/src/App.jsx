@@ -11,6 +11,7 @@ import PlaceholderPage from "./pages/PlaceholderPage";
 import ForecastAdvisory from "./pages/ForecastAdvisory";
 import HistoricalData from "./pages/HistoricalData";
 import Alerts from "./pages/Alerts";
+import Settings from "./pages/Settings";
 
 export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -73,9 +74,7 @@ export default function App() {
 
             <Route
               path="/settings"
-              element={
-                <PlaceholderPage title="Settings" />
-              }
+              element={<Settings />}
             />
           </Routes>
         </div>

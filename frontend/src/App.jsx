@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import Sidebar from "./components/Sidebar";
@@ -7,13 +8,35 @@ import Dashboard from "./pages/Dashboard";
 import PlaceholderPage from "./pages/PlaceholderPage";
 
 export default function App() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-[#f6faf9] text-slate-800">
       <div className="flex min-h-screen">
         <Sidebar />
 
+        {mobileMenuOpen && (
+          <>
+            <div
+              className="fixed inset-0 z-40 bg-slate-950/30 lg:hidden"
+              onClick={closeMobileMenu}
+            />
+
+            <Sidebar
+              mobile
+              onClose={closeMobileMenu}
+            />
+          </>
+        )}
+
         <div className="min-w-0 flex-1">
-          <Header />
+          <Header
+            onMenuClick={() => setMobileMenuOpen(true)}
+          />
 
           <Routes>
             <Route path="/" element={<Dashboard />} />
@@ -46,12 +69,16 @@ export default function App() {
 
             <Route
               path="/alerts"
-              element={<PlaceholderPage title="Alerts" />}
+              element={
+                <PlaceholderPage title="Alerts" />
+              }
             />
 
             <Route
               path="/settings"
-              element={<PlaceholderPage title="Settings" />}
+              element={
+                <PlaceholderPage title="Settings" />
+              }
             />
           </Routes>
         </div>

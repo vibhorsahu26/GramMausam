@@ -7,6 +7,7 @@ import {
   Settings,
   Sprout,
   CloudSun,
+  X,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
@@ -49,24 +50,42 @@ const menuItems = [
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ mobile = false, onClose }) {
   return (
-    <aside className="hidden min-h-screen w-[230px] shrink-0 flex-col border-r border-slate-200 bg-white lg:flex">
+    <aside
+      className={
+        mobile
+          ? "fixed inset-y-0 left-0 z-50 flex w-[270px] flex-col border-r border-slate-200 bg-white shadow-xl lg:hidden"
+          : "hidden min-h-screen w-[230px] shrink-0 flex-col border-r border-slate-200 bg-white lg:flex"
+      }
+    >
       <div className="border-b border-slate-100 px-5 py-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50">
-            <Sprout className="h-7 w-7 text-emerald-600" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50">
+              <Sprout className="h-7 w-7 text-emerald-600" />
+            </div>
+
+            <div>
+              <h1 className="text-[19px] font-bold tracking-tight text-slate-900">
+                GramMausam AI
+              </h1>
+
+              <p className="text-[10px] text-slate-500">
+                Local Weather | Smart Farming
+              </p>
+            </div>
           </div>
 
-          <div>
-            <h1 className="text-[19px] font-bold tracking-tight text-slate-900">
-              GramMausam AI
-            </h1>
-
-            <p className="text-[10px] text-slate-500">
-              Local Weather&nbsp; | &nbsp;Smart Farming
-            </p>
-          </div>
+          {mobile && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -78,6 +97,7 @@ export default function Sidebar() {
             <NavLink
               key={item.path}
               to={item.path}
+              onClick={mobile ? onClose : undefined}
               className={({ isActive }) =>
                 [
                   "group flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-all",
@@ -104,25 +124,25 @@ export default function Sidebar() {
       <div className="m-3 rounded-2xl bg-gradient-to-b from-emerald-50 to-green-50 p-4">
         <div className="mb-3 flex items-center gap-2">
           <Sprout className="h-5 w-5 text-emerald-600" />
+
           <span className="text-xs font-semibold text-emerald-800">
             Better Weather Insights
           </span>
         </div>
 
         <p className="text-[11px] leading-5 text-slate-600">
-          Local weather intelligence for smarter agricultural decisions.
+          Local weather intelligence for smarter agricultural
+          decisions.
         </p>
 
-        <div className="mt-4 flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-              Ministry of Earth Sciences
-            </div>
+        <div className="mt-5 border-t border-emerald-100 pt-3 text-center">
+          <p className="text-[10px] font-semibold text-slate-500">
+            Ministry of Earth Sciences
+          </p>
 
-            <div className="mt-1 text-[9px] text-slate-400">
-              Government of India
-            </div>
-          </div>
+          <p className="mt-1 text-[9px] text-slate-400">
+            Government of India
+          </p>
         </div>
       </div>
     </aside>

@@ -9,6 +9,7 @@ import PanchayatDetails from "./pages/PanchayatDetails";
 import MapView from "./pages/MapView";
 import PlaceholderPage from "./pages/PlaceholderPage";
 import ForecastAdvisory from "./pages/ForecastAdvisory";
+import HistoricalData from "./pages/HistoricalData";
 
 export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -61,9 +62,7 @@ export default function App() {
 
             <Route
               path="/historical"
-              element={
-                <PlaceholderPage title="Historical Data" />
-              }
+              element={<HistoricalData />}
             />
 
             <Route

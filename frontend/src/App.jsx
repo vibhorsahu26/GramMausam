@@ -10,6 +10,7 @@ import MapView from "./pages/MapView";
 import PlaceholderPage from "./pages/PlaceholderPage";
 import ForecastAdvisory from "./pages/ForecastAdvisory";
 import HistoricalData from "./pages/HistoricalData";
+import Alerts from "./pages/Alerts";
 
 export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -67,9 +68,7 @@ export default function App() {
 
             <Route
               path="/alerts"
-              element={
-                <PlaceholderPage title="Alerts" />
-              }
+              element={<Alerts />}
             />
 
             <Route

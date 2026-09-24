@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import PanchayatDetails from "./pages/PanchayatDetails";
 import MapView from "./pages/MapView";
 import PlaceholderPage from "./pages/PlaceholderPage";
+import ForecastAdvisory from "./pages/ForecastAdvisory";
 
 export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -55,9 +56,7 @@ export default function App() {
 
             <Route
               path="/forecast"
-              element={
-                <PlaceholderPage title="Forecast & Advisory" />
-              }
+              element={<ForecastAdvisory />}
             />
 
             <Route

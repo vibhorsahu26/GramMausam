@@ -5,6 +5,7 @@ import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 
 import Dashboard from "./pages/Dashboard";
+import PanchayatDetails from "./pages/PanchayatDetails";
 import PlaceholderPage from "./pages/PlaceholderPage";
 
 export default function App() {
@@ -48,9 +49,7 @@ export default function App() {
 
             <Route
               path="/panchayat-details"
-              element={
-                <PlaceholderPage title="Panchayat Details" />
-              }
+              element={<PanchayatDetails />}
             />
 
             <Route

@@ -47,18 +47,18 @@ export default function ForecastAdvisory() {
       stage,
       rainfall: today.rainfall,
       rainProbability: today.rainProbability,
-      temperature: today.max,
+      temperature: today.maxTemp,
       humidity: today.humidity,
-      wind: today.wind,
+      wind: today.windSpeed,
     });
   }, [
     crop,
     stage,
     today.rainfall,
     today.rainProbability,
-    today.max,
+    today.maxTemp,
     today.humidity,
-    today.wind,
+    today.windSpeed,
   ]);
 
   const handleCropChange = (value) => {
@@ -128,7 +128,7 @@ export default function ForecastAdvisory() {
 
             <div>
               <p className="text-3xl font-bold text-slate-900">
-                {today.max}°C
+                {today.maxTemp}°C
               </p>
 
               <p className="mt-1 text-xs text-slate-500">

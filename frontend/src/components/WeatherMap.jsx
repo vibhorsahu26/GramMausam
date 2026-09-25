@@ -14,16 +14,13 @@ import {
   useMap,
 } from "react-leaflet";
 
+import { getWeather } from "../services/weatherService";
+
 const center = [25.44, 81.84];
 
 const panchayatData = [
   {
     name: "Bara",
-    rainfall: 18,
-    temperature: 32,
-    humidity: 78,
-    wind: 12,
-    risk: "Medium",
     bounds: [
       [25.48, 81.78],
       [25.53, 81.84],
@@ -31,11 +28,6 @@ const panchayatData = [
   },
   {
     name: "Kareli",
-    rainfall: 26,
-    temperature: 33,
-    humidity: 82,
-    wind: 14,
-    risk: "High",
     bounds: [
       [25.4, 81.76],
       [25.47, 81.82],
@@ -43,11 +35,6 @@ const panchayatData = [
   },
   {
     name: "Soraon",
-    rainfall: 32,
-    temperature: 34,
-    humidity: 85,
-    wind: 16,
-    risk: "High",
     bounds: [
       [25.44, 81.84],
       [25.5, 81.91],
@@ -55,11 +42,6 @@ const panchayatData = [
   },
   {
     name: "Phaphamau",
-    rainfall: 21,
-    temperature: 32,
-    humidity: 80,
-    wind: 12,
-    risk: "Medium",
     bounds: [
       [25.35, 81.82],
       [25.42, 81.9],
@@ -67,11 +49,6 @@ const panchayatData = [
   },
   {
     name: "Jasra",
-    rainfall: 16,
-    temperature: 31,
-    humidity: 76,
-    wind: 10,
-    risk: "Low",
     bounds: [
       [25.35, 81.75],
       [25.41, 81.81],
@@ -91,7 +68,8 @@ export default function WeatherMap({
   selectedPanchayat,
   onPanchayatSelect,
 }) {
-  const [activeLayer, setActiveLayer] = useState("Rainfall");
+  const [activeLayer, setActiveLayer] =
+    useState("Rainfall");
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
@@ -138,12 +116,14 @@ export default function WeatherMap({
           />
 
           {panchayatData.map((item) => {
+            const weather = getWeather(item.name);
+
             const isSelected =
               item.name === selectedPanchayat;
 
             const fillColor = getLayerColor(
               activeLayer,
-              item
+              weather
             );
 
             return (
@@ -170,12 +150,15 @@ export default function WeatherMap({
 
                     <br />
 
-                    {getLayerValue(activeLayer, item)}
+                    {getLayerValue(
+                      activeLayer,
+                      weather
+                    )}
 
                     <br />
 
                     <span>
-                      {item.risk} risk
+                      {weather.risk} risk
                     </span>
                   </div>
                 </Tooltip>
@@ -203,57 +186,90 @@ export default function WeatherMap({
   );
 }
 
-function getLayerValue(layer, item) {
+function getLayerValue(layer, weather) {
   switch (layer) {
     case "Rainfall":
-      return `${item.rainfall} mm`;
+      return `${weather.rainfall} mm`;
 
     case "Temperature":
-      return `${item.temperature}°C`;
+      return `${weather.maxTemp}°C`;
 
     case "Humidity":
-      return `${item.humidity}%`;
+      return `${weather.humidity}%`;
 
     case "Wind":
-      return `${item.wind} km/h`;
+      return `${weather.windSpeed} km/h`;
 
     case "Risk":
-      return `${item.risk} Risk`;
+      return `${weather.risk} Risk`;
 
     default:
       return "";
   }
 }
 
-function getLayerColor(layer, item) {
+function getLayerColor(layer, weather) {
   if (layer === "Rainfall") {
-    if (item.rainfall >= 30) return "#f97316";
-    if (item.rainfall >= 25) return "#facc15";
-    if (item.rainfall >= 20) return "#22c55e";
+    if (weather.rainfall >= 30) {
+      return "#f97316";
+    }
+
+    if (weather.rainfall >= 25) {
+      return "#facc15";
+    }
+
+    if (weather.rainfall >= 20) {
+      return "#22c55e";
+    }
+
     return "#4ade80";
   }
 
   if (layer === "Temperature") {
-    if (item.temperature >= 34) return "#ef4444";
-    if (item.temperature >= 32) return "#f97316";
+    if (weather.maxTemp >= 35) {
+      return "#ef4444";
+    }
+
+    if (weather.maxTemp >= 32) {
+      return "#f97316";
+    }
+
     return "#facc15";
   }
 
   if (layer === "Humidity") {
-    if (item.humidity >= 84) return "#2563eb";
-    if (item.humidity >= 80) return "#38bdf8";
+    if (weather.humidity >= 84) {
+      return "#2563eb";
+    }
+
+    if (weather.humidity >= 80) {
+      return "#38bdf8";
+    }
+
     return "#7dd3fc";
   }
 
   if (layer === "Wind") {
-    if (item.wind >= 15) return "#dc2626";
-    if (item.wind >= 12) return "#f59e0b";
+    if (weather.windSpeed >= 15) {
+      return "#dc2626";
+    }
+
+    if (weather.windSpeed >= 12) {
+      return "#f59e0b";
+    }
+
     return "#22c55e";
   }
 
   if (layer === "Risk") {
-    if (item.risk === "High") return "#ef4444";
-    if (item.risk === "Medium") return "#f59e0b";
+    if (weather.risk === "High") {
+      return "#ef4444";
+    }
+
+    if (weather.risk === "Medium") {
+      return "#f59e0b";
+    }
+
     return "#22c55e";
   }
 
@@ -273,20 +289,14 @@ function MapLegend({ activeLayer }) {
 
   return (
     <div className="border-t border-slate-100 px-4 py-3">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[11px] font-semibold text-slate-700">
             {activeLayer}
           </p>
 
           <div className="mt-2 flex items-center gap-1">
-            {[
-              "#2563eb",
-              "#22c55e",
-              "#facc15",
-              "#f97316",
-              "#dc2626",
-            ].map((color) => (
+            {getLegendColors(activeLayer).map((color) => (
               <span
                 key={color}
                 className="h-2.5 w-8 rounded-full"
@@ -295,7 +305,13 @@ function MapLegend({ activeLayer }) {
             ))}
           </div>
 
-          <div className="mt-1 flex justify-between text-[8px] text-slate-400">
+          <div
+            className={`mt-1 flex ${
+              activeLayer === "Risk"
+                ? "justify-between"
+                : "justify-between"
+            } text-[8px] text-slate-400`}
+          >
             {values.map((value) => (
               <span key={value}>{value}</span>
             ))}
@@ -311,6 +327,24 @@ function MapLegend({ activeLayer }) {
   );
 }
 
+function getLegendColors(layer) {
+  if (layer === "Risk") {
+    return [
+      "#22c55e",
+      "#f59e0b",
+      "#ef4444",
+    ];
+  }
+
+  return [
+    "#2563eb",
+    "#22c55e",
+    "#facc15",
+    "#f97316",
+    "#dc2626",
+  ];
+}
+
 function MapControls() {
   const map = useMap();
 
@@ -321,6 +355,7 @@ function MapControls() {
           type="button"
           onClick={() => map.zoomIn()}
           className="p-2 hover:bg-slate-50"
+          aria-label="Zoom in"
         >
           <Plus className="h-4 w-4" />
         </button>
@@ -329,6 +364,7 @@ function MapControls() {
           type="button"
           onClick={() => map.zoomOut()}
           className="border-t border-slate-100 p-2 hover:bg-slate-50"
+          aria-label="Zoom out"
         >
           <Minus className="h-4 w-4" />
         </button>
@@ -338,6 +374,7 @@ function MapControls() {
         type="button"
         onClick={() => map.setView(center, 11)}
         className="absolute bottom-4 right-4 z-[1000] rounded-full bg-white p-2 shadow-md"
+        aria-label="Reset map view"
       >
         <Navigation className="h-4 w-4 text-slate-700" />
       </button>

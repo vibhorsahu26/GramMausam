@@ -34,7 +34,7 @@ const parameters = [
 
 const chartKeys = {
   Rainfall: "rainfall",
-  Temperature: "max",
+  Temperature: "maxTemp",
   Humidity: "humidity",
 };
 
@@ -467,7 +467,7 @@ export default function PanchayatDetails() {
                   </td>
 
                   <td className="px-4 py-3 text-xs text-slate-600">
-                    {item.max}°C / {item.min}°C
+                    {item.maxTemp}°C / {item.minTemp}°C
                   </td>
 
                   <td className="px-4 py-3 text-xs text-slate-600">

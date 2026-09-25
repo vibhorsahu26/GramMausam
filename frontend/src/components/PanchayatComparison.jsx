@@ -1,7 +1,9 @@
 import { BarChart3 } from "lucide-react";
-import { comparisonData } from "../data/mockData";
 
-export default function PanchayatComparison() {
+export default function PanchayatComparison({
+  data,
+}) {
+
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5">
       <div className="mb-4 flex items-center gap-2">
@@ -38,7 +40,7 @@ export default function PanchayatComparison() {
           </thead>
 
           <tbody>
-            {comparisonData.map((row) => (
+            {data.map((row) => (
               <tr
                 key={row.name}
                 className="border-b border-slate-100 last:border-0"

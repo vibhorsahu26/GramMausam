@@ -1,9 +1,4 @@
-import {
-  comparisonData,
-  trendData,
-  weatherByPanchayat,
-} from "../data/mockData";
-
+import { weatherByPanchayat } from "../data/mockData";
 import { forecastByPanchayat } from "../data/forecastData";
 
 export function getWeather(panchayat) {
@@ -22,12 +17,4 @@ export function getForecast(panchayat) {
 
 export function getPanchayats() {
   return Object.keys(weatherByPanchayat);
-}
-
-export function getComparisonData() {
-  return comparisonData;
-}
-
-export function getTrendData() {
-  return trendData;
 }

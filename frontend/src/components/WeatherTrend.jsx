@@ -1,118 +1,275 @@
+import { useMemo, useState } from "react";
 import {
   Bar,
   CartesianGrid,
   ComposedChart,
   Line,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 
-import { trendData } from "../data/mockData";
+import { getForecast } from "../services/weatherService";
 
-export default function WeatherTrend() {
+const parameters = [
+  "Rainfall",
+  "Temperature",
+  "Humidity",
+];
+
+export default function WeatherTrend({
+  panchayat,
+}) {
+  const [activeParameter, setActiveParameter] =
+    useState("Rainfall");
+
+  const forecast = getForecast(panchayat);
+
+  const chartData = useMemo(() => {
+    return forecast.map((item) => ({
+      date: item.date,
+      rainfall: item.rainfall,
+      probability: item.rainProbability,
+      temperature: item.maxTemp,
+      humidity: item.humidity,
+    }));
+  }, [forecast]);
+
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5">
-      <div className="mb-5 flex items-center justify-between">
+      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <h2 className="text-sm font-bold text-slate-800">
-            Weather Trend (Bara)
+            Weather Trend ({panchayat})
           </h2>
 
           <p className="mt-1 text-[10px] text-slate-400">
-            Expected rainfall and probability
+            Forecast trend for the selected Panchayat
           </p>
         </div>
 
         <div className="flex gap-1">
-          {["Rainfall", "Temperature", "Humidity"].map(
-            (item, index) => (
-              <button
-                key={item}
-                className={`rounded-lg px-3 py-1.5 text-[10px] ${
-                  index === 0
-                    ? "bg-emerald-700 text-white"
-                    : "bg-slate-50 text-slate-500"
-                }`}
-              >
-                {item}
-              </button>
-            )
-          )}
+          {parameters.map((parameter) => (
+            <button
+              key={parameter}
+              type="button"
+              onClick={() =>
+                setActiveParameter(parameter)
+              }
+              className={`rounded-lg px-3 py-1.5 text-[10px] font-medium transition ${
+                activeParameter === parameter
+                  ? "bg-emerald-700 text-white"
+                  : "bg-slate-50 text-slate-500 hover:bg-slate-100"
+              }`}
+            >
+              {parameter}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="h-[280px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={trendData}>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              vertical={false}
-              stroke="#e2e8f0"
-            />
+      <div className="mt-5 h-[280px] w-full">
+        {activeParameter === "Rainfall" && (
+          <RainfallChart data={chartData} />
+        )}
 
-            <XAxis
-              dataKey="date"
-              tick={{
-                fontSize: 10,
-                fill: "#64748b",
-              }}
-              axisLine={false}
-              tickLine={false}
-            />
+        {activeParameter === "Temperature" && (
+          <TemperatureChart data={chartData} />
+        )}
 
-            <YAxis
-              yAxisId="left"
-              tick={{
-                fontSize: 10,
-                fill: "#64748b",
-              }}
-              axisLine={false}
-              tickLine={false}
-            />
-
-            <YAxis
-              yAxisId="right"
-              orientation="right"
-              tick={{
-                fontSize: 10,
-                fill: "#64748b",
-              }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(value) => `${value}%`}
-            />
-
-            <Tooltip
-              contentStyle={{
-                borderRadius: "12px",
-                border: "1px solid #e2e8f0",
-                fontSize: "11px",
-              }}
-            />
-
-            <Bar
-              yAxisId="left"
-              dataKey="rainfall"
-              barSize={28}
-              fill="#10b981"
-              radius={[5, 5, 0, 0]}
-            />
-
-            <Line
-              yAxisId="right"
-              type="monotone"
-              dataKey="probability"
-              stroke="#0ea5e9"
-              strokeWidth={2.5}
-              dot={{
-                r: 3,
-              }}
-            />
-          </ComposedChart>
-        </ResponsiveContainer>
+        {activeParameter === "Humidity" && (
+          <HumidityChart data={chartData} />
+        )}
       </div>
     </section>
+  );
+}
+
+function RainfallChart({ data }) {
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <ComposedChart data={data}>
+        <CartesianGrid
+          strokeDasharray="3 3"
+          vertical={false}
+          stroke="#e2e8f0"
+        />
+
+        <XAxis
+          dataKey="date"
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#64748b",
+          }}
+        />
+
+        <YAxis
+          yAxisId="rain"
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#64748b",
+          }}
+        />
+
+        <YAxis
+          yAxisId="probability"
+          orientation="right"
+          domain={[0, 100]}
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#64748b",
+          }}
+          tickFormatter={(value) => `${value}%`}
+        />
+
+        <Tooltip
+          contentStyle={{
+            borderRadius: "12px",
+            border: "1px solid #e2e8f0",
+            fontSize: "11px",
+          }}
+        />
+
+        <Bar
+          yAxisId="rain"
+          dataKey="rainfall"
+          name="Rainfall (mm)"
+          barSize={28}
+          fill="#10b981"
+          radius={[5, 5, 0, 0]}
+        />
+
+        <Line
+          yAxisId="probability"
+          type="monotone"
+          dataKey="probability"
+          name="Rain Probability (%)"
+          stroke="#0ea5e9"
+          strokeWidth={2.5}
+          dot={{ r: 3 }}
+        />
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+}
+
+function TemperatureChart({ data }) {
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart data={data}>
+        <CartesianGrid
+          strokeDasharray="3 3"
+          vertical={false}
+          stroke="#e2e8f0"
+        />
+
+        <XAxis
+          dataKey="date"
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#64748b",
+          }}
+        />
+
+        <YAxis
+          unit="°C"
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#64748b",
+          }}
+        />
+
+        <Tooltip
+          formatter={(value) => [
+            `${value}°C`,
+            "Max Temperature",
+          ]}
+          contentStyle={{
+            borderRadius: "12px",
+            border: "1px solid #e2e8f0",
+            fontSize: "11px",
+          }}
+        />
+
+        <Line
+          type="monotone"
+          dataKey="temperature"
+          name="Max Temperature"
+          stroke="#f97316"
+          strokeWidth={2.5}
+          dot={{ r: 3 }}
+          activeDot={{ r: 5 }}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+}
+
+function HumidityChart({ data }) {
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart data={data}>
+        <CartesianGrid
+          strokeDasharray="3 3"
+          vertical={false}
+          stroke="#e2e8f0"
+        />
+
+        <XAxis
+          dataKey="date"
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#64748b",
+          }}
+        />
+
+        <YAxis
+          domain={[0, 100]}
+          axisLine={false}
+          tickLine={false}
+          tick={{
+            fontSize: 10,
+            fill: "#64748b",
+          }}
+          tickFormatter={(value) => `${value}%`}
+        />
+
+        <Tooltip
+          formatter={(value) => [
+            `${value}%`,
+            "Humidity",
+          ]}
+          contentStyle={{
+            borderRadius: "12px",
+            border: "1px solid #e2e8f0",
+            fontSize: "11px",
+          }}
+        />
+
+        <Line
+          type="monotone"
+          dataKey="humidity"
+          name="Humidity"
+          stroke="#0ea5e9"
+          strokeWidth={2.5}
+          dot={{ r: 3 }}
+          activeDot={{ r: 5 }}
+        />
+      </LineChart>
+    </ResponsiveContainer>
   );
 }

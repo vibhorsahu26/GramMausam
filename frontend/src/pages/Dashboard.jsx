@@ -12,6 +12,11 @@ import QuickLinks from "../components/QuickLinks";
 
 import { getWeather } from "../services/weatherService";
 
+import {
+  getComparisonData,
+  getTrendData,
+} from "../services/dashboardService";
+
 export default function Dashboard() {
   const [selected, setSelected] = useState({
     state: "Uttar Pradesh",
@@ -21,6 +26,8 @@ export default function Dashboard() {
   });
 
   const weather = getWeather(selected.panchayat);
+  const comparisonData = getComparisonData();
+  const trendData = getTrendData();
 
   return (
     <main className="mx-auto w-full max-w-[1700px] p-4 sm:p-6 xl:p-8">
@@ -41,8 +48,10 @@ export default function Dashboard() {
             />
 
             <div className="grid gap-4 lg:grid-cols-2">
-              <PanchayatComparison />
-              <WeatherTrend />
+              <PanchayatComparison data={comparisonData} />
+              <WeatherTrend
+                panchayat={selected.panchayat}
+              />
             </div>
           </div>
 

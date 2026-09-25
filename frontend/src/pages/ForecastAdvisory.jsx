@@ -14,446 +14,15 @@ import {
 
 import { weatherByPanchayat } from "../data/mockData";
 
-const crops = {
-  Wheat: {
-    stages: [
-      "Germination",
-      "Vegetative Stage",
-      "Flowering",
-      "Maturity",
-    ],
-  },
+import {
+  createAdvisory,
+  crops,
+} from "../services/advisoryService";
 
-  Rice: {
-    stages: [
-      "Nursery",
-      "Vegetative Stage",
-      "Tillering",
-      "Flowering",
-      "Maturity",
-    ],
-  },
+import {
+  getForecast,
+} from "../services/weatherService";
 
-  Mustard: {
-    stages: [
-      "Vegetative Stage",
-      "Flowering",
-      "Pod Formation",
-      "Maturity",
-    ],
-  },
-
-  Potato: {
-    stages: [
-      "Vegetative Stage",
-      "Tuber Formation",
-      "Tuber Bulking",
-      "Maturity",
-    ],
-  },
-};
-
-const forecastData = {
-  Bara: [
-    {
-      date: "24 Apr",
-      day: "Today",
-      rainfall: 18,
-      rainProbability: 72,
-      max: 32,
-      min: 24,
-      humidity: 78,
-      wind: 12,
-      condition: "Light Rain",
-    },
-    {
-      date: "25 Apr",
-      day: "Tomorrow",
-      rainfall: 12,
-      rainProbability: 58,
-      max: 34,
-      min: 25,
-      humidity: 74,
-      wind: 11,
-      condition: "Partly Cloudy",
-    },
-    {
-      date: "26 Apr",
-      day: "Day 3",
-      rainfall: 5,
-      rainProbability: 36,
-      max: 35,
-      min: 26,
-      humidity: 69,
-      wind: 10,
-      condition: "Partly Cloudy",
-    },
-    {
-      date: "27 Apr",
-      day: "Day 4",
-      rainfall: 9,
-      rainProbability: 42,
-      max: 33,
-      min: 24,
-      humidity: 72,
-      wind: 12,
-      condition: "Light Rain",
-    },
-    {
-      date: "28 Apr",
-      day: "Day 5",
-      rainfall: 7,
-      rainProbability: 31,
-      max: 32,
-      min: 23,
-      humidity: 70,
-      wind: 9,
-      condition: "Cloudy",
-    },
-    {
-      date: "29 Apr",
-      day: "Day 6",
-      rainfall: 6,
-      rainProbability: 25,
-      max: 34,
-      min: 24,
-      humidity: 67,
-      wind: 10,
-      condition: "Mostly Clear",
-    },
-    {
-      date: "30 Apr",
-      day: "Day 7",
-      rainfall: 4,
-      rainProbability: 18,
-      max: 35,
-      min: 25,
-      humidity: 64,
-      wind: 11,
-      condition: "Sunny",
-    },
-  ],
-
-  Kareli: [
-    {
-      date: "24 Apr",
-      day: "Today",
-      rainfall: 26,
-      rainProbability: 81,
-      max: 33,
-      min: 25,
-      humidity: 82,
-      wind: 14,
-      condition: "Rain",
-    },
-    {
-      date: "25 Apr",
-      day: "Tomorrow",
-      rainfall: 18,
-      rainProbability: 69,
-      max: 33,
-      min: 25,
-      humidity: 80,
-      wind: 13,
-      condition: "Light Rain",
-    },
-    {
-      date: "26 Apr",
-      day: "Day 3",
-      rainfall: 7,
-      rainProbability: 35,
-      max: 35,
-      min: 26,
-      humidity: 70,
-      wind: 10,
-      condition: "Cloudy",
-    },
-    {
-      date: "27 Apr",
-      day: "Day 4",
-      rainfall: 5,
-      rainProbability: 28,
-      max: 36,
-      min: 26,
-      humidity: 67,
-      wind: 9,
-      condition: "Sunny",
-    },
-    {
-      date: "28 Apr",
-      day: "Day 5",
-      rainfall: 6,
-      rainProbability: 25,
-      max: 35,
-      min: 25,
-      humidity: 68,
-      wind: 10,
-      condition: "Mostly Clear",
-    },
-    {
-      date: "29 Apr",
-      day: "Day 6",
-      rainfall: 4,
-      rainProbability: 19,
-      max: 36,
-      min: 26,
-      humidity: 63,
-      wind: 11,
-      condition: "Sunny",
-    },
-    {
-      date: "30 Apr",
-      day: "Day 7",
-      rainfall: 3,
-      rainProbability: 14,
-      max: 37,
-      min: 27,
-      humidity: 61,
-      wind: 12,
-      condition: "Sunny",
-    },
-  ],
-
-  Soraon: [
-    {
-      date: "24 Apr",
-      day: "Today",
-      rainfall: 32,
-      rainProbability: 88,
-      max: 34,
-      min: 26,
-      humidity: 85,
-      wind: 16,
-      condition: "Heavy Rain",
-    },
-    {
-      date: "25 Apr",
-      day: "Tomorrow",
-      rainfall: 22,
-      rainProbability: 74,
-      max: 33,
-      min: 25,
-      humidity: 83,
-      wind: 15,
-      condition: "Rain",
-    },
-    {
-      date: "26 Apr",
-      day: "Day 3",
-      rainfall: 8,
-      rainProbability: 39,
-      max: 35,
-      min: 26,
-      humidity: 72,
-      wind: 11,
-      condition: "Cloudy",
-    },
-    {
-      date: "27 Apr",
-      day: "Day 4",
-      rainfall: 6,
-      rainProbability: 27,
-      max: 35,
-      min: 25,
-      humidity: 68,
-      wind: 10,
-      condition: "Sunny",
-    },
-    {
-      date: "28 Apr",
-      day: "Day 5",
-      rainfall: 5,
-      rainProbability: 22,
-      max: 36,
-      min: 26,
-      humidity: 65,
-      wind: 11,
-      condition: "Sunny",
-    },
-    {
-      date: "29 Apr",
-      day: "Day 6",
-      rainfall: 4,
-      rainProbability: 17,
-      max: 37,
-      min: 27,
-      humidity: 62,
-      wind: 12,
-      condition: "Sunny",
-    },
-    {
-      date: "30 Apr",
-      day: "Day 7",
-      rainfall: 3,
-      rainProbability: 13,
-      max: 37,
-      min: 27,
-      humidity: 60,
-      wind: 12,
-      condition: "Sunny",
-    },
-  ],
-
-  Phaphamau: [
-    {
-      date: "24 Apr",
-      day: "Today",
-      rainfall: 21,
-      rainProbability: 76,
-      max: 32,
-      min: 24,
-      humidity: 80,
-      wind: 12,
-      condition: "Light Rain",
-    },
-    {
-      date: "25 Apr",
-      day: "Tomorrow",
-      rainfall: 11,
-      rainProbability: 53,
-      max: 34,
-      min: 25,
-      humidity: 74,
-      wind: 11,
-      condition: "Cloudy",
-    },
-    {
-      date: "26 Apr",
-      day: "Day 3",
-      rainfall: 5,
-      rainProbability: 33,
-      max: 35,
-      min: 26,
-      humidity: 70,
-      wind: 10,
-      condition: "Sunny",
-    },
-    {
-      date: "27 Apr",
-      day: "Day 4",
-      rainfall: 7,
-      rainProbability: 35,
-      max: 34,
-      min: 25,
-      humidity: 71,
-      wind: 10,
-      condition: "Cloudy",
-    },
-    {
-      date: "28 Apr",
-      day: "Day 5",
-      rainfall: 5,
-      rainProbability: 24,
-      max: 33,
-      min: 24,
-      humidity: 68,
-      wind: 9,
-      condition: "Sunny",
-    },
-    {
-      date: "29 Apr",
-      day: "Day 6",
-      rainfall: 4,
-      rainProbability: 19,
-      max: 35,
-      min: 25,
-      humidity: 65,
-      wind: 10,
-      condition: "Sunny",
-    },
-    {
-      date: "30 Apr",
-      day: "Day 7",
-      rainfall: 3,
-      rainProbability: 14,
-      max: 36,
-      min: 26,
-      humidity: 62,
-      wind: 11,
-      condition: "Sunny",
-    },
-  ],
-
-  Jasra: [
-    {
-      date: "24 Apr",
-      day: "Today",
-      rainfall: 16,
-      rainProbability: 61,
-      max: 31,
-      min: 23,
-      humidity: 76,
-      wind: 10,
-      condition: "Cloudy",
-    },
-    {
-      date: "25 Apr",
-      day: "Tomorrow",
-      rainfall: 9,
-      rainProbability: 42,
-      max: 33,
-      min: 24,
-      humidity: 72,
-      wind: 9,
-      condition: "Cloudy",
-    },
-    {
-      date: "26 Apr",
-      day: "Day 3",
-      rainfall: 3,
-      rainProbability: 19,
-      max: 34,
-      min: 25,
-      humidity: 67,
-      wind: 10,
-      condition: "Sunny",
-    },
-    {
-      date: "27 Apr",
-      day: "Day 4",
-      rainfall: 4,
-      rainProbability: 22,
-      max: 34,
-      min: 25,
-      humidity: 66,
-      wind: 9,
-      condition: "Sunny",
-    },
-    {
-      date: "28 Apr",
-      day: "Day 5",
-      rainfall: 3,
-      rainProbability: 17,
-      max: 35,
-      min: 26,
-      humidity: 63,
-      wind: 10,
-      condition: "Sunny",
-    },
-    {
-      date: "29 Apr",
-      day: "Day 6",
-      rainfall: 2,
-      rainProbability: 12,
-      max: 35,
-      min: 26,
-      humidity: 60,
-      wind: 11,
-      condition: "Sunny",
-    },
-    {
-      date: "30 Apr",
-      day: "Day 7",
-      rainfall: 2,
-      rainProbability: 10,
-      max: 36,
-      min: 26,
-      humidity: 58,
-      wind: 11,
-      condition: "Sunny",
-    },
-  ],
-};
 
 export default function ForecastAdvisory() {
   const [panchayat, setPanchayat] = useState("Bara");
@@ -466,8 +35,7 @@ export default function ForecastAdvisory() {
     weatherByPanchayat[panchayat] ||
     weatherByPanchayat.Bara;
 
-  const forecast =
-    forecastData[panchayat] || forecastData.Bara;
+  const forecast = getForecast(panchayat);
 
   const stageOptions = crops[crop].stages;
 
@@ -947,142 +515,142 @@ function ShieldAlertIcon() {
   );
 }
 
-function createAdvisory({
-  crop,
-  stage,
-  rainfall,
-  rainProbability,
-  temperature,
-  humidity,
-  wind,
-}) {
-  const heavyRain =
-    rainfall >= 25 || rainProbability >= 80;
+// function createAdvisory({
+//   crop,
+//   stage,
+//   rainfall,
+//   rainProbability,
+//   temperature,
+//   humidity,
+//   wind,
+// }) {
+//   const heavyRain =
+//     rainfall >= 25 || rainProbability >= 80;
 
-  const moderateRain =
-    rainfall >= 15 || rainProbability >= 60;
+//   const moderateRain =
+//     rainfall >= 15 || rainProbability >= 60;
 
-  const heat =
-    temperature >= 35;
+//   const heat =
+//     temperature >= 35;
 
-  const strongWind =
-    wind >= 15;
+//   const strongWind =
+//     wind >= 15;
 
-  const highHumidity =
-    humidity >= 80;
+//   const highHumidity =
+//     humidity >= 80;
 
-  const actions = [];
+//   const actions = [];
 
-  if (heavyRain) {
-    actions.push({
-      title: "Avoid irrigation",
-      description:
-        "Expected rainfall may provide sufficient moisture and increase the risk of excess water.",
-    });
-  } else if (moderateRain) {
-    actions.push({
-      title: "Review irrigation timing",
-      description:
-        "Check field moisture before the next irrigation cycle instead of following a fixed schedule.",
-    });
-  } else {
-    actions.push({
-      title: "Monitor soil moisture",
-      description:
-        "Lower rainfall conditions may require irrigation depending on field moisture and crop demand.",
-    });
-  }
+//   if (heavyRain) {
+//     actions.push({
+//       title: "Avoid irrigation",
+//       description:
+//         "Expected rainfall may provide sufficient moisture and increase the risk of excess water.",
+//     });
+//   } else if (moderateRain) {
+//     actions.push({
+//       title: "Review irrigation timing",
+//       description:
+//         "Check field moisture before the next irrigation cycle instead of following a fixed schedule.",
+//     });
+//   } else {
+//     actions.push({
+//       title: "Monitor soil moisture",
+//       description:
+//         "Lower rainfall conditions may require irrigation depending on field moisture and crop demand.",
+//     });
+//   }
 
-  if (heavyRain) {
-    actions.push({
-      title: "Protect field drainage",
-      description:
-        "Inspect drainage channels and low-lying portions of the field before the rainfall event.",
-    });
-  } else {
-    actions.push({
-      title: "Field operations can continue",
-      description:
-        "Weather conditions are comparatively suitable for routine field activity.",
-    });
-  }
+//   if (heavyRain) {
+//     actions.push({
+//       title: "Protect field drainage",
+//       description:
+//         "Inspect drainage channels and low-lying portions of the field before the rainfall event.",
+//     });
+//   } else {
+//     actions.push({
+//       title: "Field operations can continue",
+//       description:
+//         "Weather conditions are comparatively suitable for routine field activity.",
+//     });
+//   }
 
-  if (highHumidity) {
-    actions.push({
-      title: "Monitor for disease",
-      description:
-        "Persistent humid conditions can increase the suitability for some fungal and moisture-related crop problems.",
-    });
-  } else {
-    actions.push({
-      title: "Continue crop monitoring",
-      description:
-        "Regular scouting should continue through the current crop stage.",
-    });
-  }
+//   if (highHumidity) {
+//     actions.push({
+//       title: "Monitor for disease",
+//       description:
+//         "Persistent humid conditions can increase the suitability for some fungal and moisture-related crop problems.",
+//     });
+//   } else {
+//     actions.push({
+//       title: "Continue crop monitoring",
+//       description:
+//         "Regular scouting should continue through the current crop stage.",
+//     });
+//   }
 
-  if (heat) {
-    actions.push({
-      title: "Monitor heat stress",
-      description:
-        "Higher daytime temperatures may increase crop water demand, especially in sensitive stages.",
-    });
-  } else if (strongWind) {
-    actions.push({
-      title: "Check wind-sensitive operations",
-      description:
-        "Avoid weather-sensitive field operations when stronger winds are expected.",
-    });
-  } else {
-    actions.push({
-      title: "Normal crop monitoring",
-      description:
-        "No major temperature or wind-related concern is indicated by today's demonstration forecast.",
-    });
-  }
+//   if (heat) {
+//     actions.push({
+//       title: "Monitor heat stress",
+//       description:
+//         "Higher daytime temperatures may increase crop water demand, especially in sensitive stages.",
+//     });
+//   } else if (strongWind) {
+//     actions.push({
+//       title: "Check wind-sensitive operations",
+//       description:
+//         "Avoid weather-sensitive field operations when stronger winds are expected.",
+//     });
+//   } else {
+//     actions.push({
+//       title: "Normal crop monitoring",
+//       description:
+//         "No major temperature or wind-related concern is indicated by today's demonstration forecast.",
+//     });
+//   }
 
-  let level = "Low";
+//   let level = "Low";
 
-  if (heavyRain || (heat && highHumidity)) {
-    level = "High";
-  } else if (moderateRain || heat || strongWind) {
-    level = "Medium";
-  }
+//   if (heavyRain || (heat && highHumidity)) {
+//     level = "High";
+//   } else if (moderateRain || heat || strongWind) {
+//     level = "Medium";
+//   }
 
-  const summary =
-    level === "High"
-      ? `Weather conditions require closer attention for ${crop} during the ${stage.toLowerCase()} stage.`
-      : level === "Medium"
-        ? `Some weather-related adjustments may be useful for ${crop} during the ${stage.toLowerCase()} stage.`
-        : `Current weather conditions show no major immediate advisory concern for ${crop}.`;
+//   const summary =
+//     level === "High"
+//       ? `Weather conditions require closer attention for ${crop} during the ${stage.toLowerCase()} stage.`
+//       : level === "Medium"
+//         ? `Some weather-related adjustments may be useful for ${crop} during the ${stage.toLowerCase()} stage.`
+//         : `Current weather conditions show no major immediate advisory concern for ${crop}.`;
 
-  return {
-    level,
-    summary,
-    actions,
-    rainfallRisk: heavyRain
-      ? "High"
-      : moderateRain
-        ? "Moderate"
-        : "Low",
-    heatRisk: heat ? "Moderate" : "Low",
-    windRisk: strongWind ? "Moderate" : "Low",
-    moistureRisk: highHumidity ? "Moderate" : "Low",
+//   return {
+//     level,
+//     summary,
+//     actions,
+//     rainfallRisk: heavyRain
+//       ? "High"
+//       : moderateRain
+//         ? "Moderate"
+//         : "Low",
+//     heatRisk: heat ? "Moderate" : "Low",
+//     windRisk: strongWind ? "Moderate" : "Low",
+//     moistureRisk: highHumidity ? "Moderate" : "Low",
 
-    irrigation: heavyRain
-      ? "Delay irrigation and reassess field moisture after rainfall."
-      : moderateRain
-        ? "Check soil moisture before irrigation."
-        : "Irrigate according to soil moisture and crop requirement.",
+//     irrigation: heavyRain
+//       ? "Delay irrigation and reassess field moisture after rainfall."
+//       : moderateRain
+//         ? "Check soil moisture before irrigation."
+//         : "Irrigate according to soil moisture and crop requirement.",
 
-    fieldOperations: heavyRain
-      ? "Avoid unnecessary field operations during rainfall."
-      : strongWind
-        ? "Avoid wind-sensitive operations during stronger winds."
-        : "Routine field operations can continue with normal precautions.",
+//     fieldOperations: heavyRain
+//       ? "Avoid unnecessary field operations during rainfall."
+//       : strongWind
+//         ? "Avoid wind-sensitive operations during stronger winds."
+//         : "Routine field operations can continue with normal precautions.",
 
-    monitoring: highHumidity
-      ? "Increase monitoring for moisture-related pest and disease conditions."
-      : "Continue regular crop and field monitoring.",
-  };
-}
+//     monitoring: highHumidity
+//       ? "Increase monitoring for moisture-related pest and disease conditions."
+//       : "Continue regular crop and field monitoring.",
+//   };
+// }

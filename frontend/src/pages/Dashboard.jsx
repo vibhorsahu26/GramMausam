@@ -10,7 +10,7 @@ import PanchayatComparison from "../components/PanchayatComparison";
 import WeatherTrend from "../components/WeatherTrend";
 import QuickLinks from "../components/QuickLinks";
 
-import { weatherByPanchayat } from "../data/mockData";
+import { getWeather } from "../services/weatherService";
 
 export default function Dashboard() {
   const [selected, setSelected] = useState({
@@ -20,9 +20,7 @@ export default function Dashboard() {
     panchayat: "Bara",
   });
 
-  const weather =
-    weatherByPanchayat[selected.panchayat] ||
-    weatherByPanchayat.Bara;
+  const weather = getWeather(selected.panchayat);
 
   return (
     <main className="mx-auto w-full max-w-[1700px] p-4 sm:p-6 xl:p-8">

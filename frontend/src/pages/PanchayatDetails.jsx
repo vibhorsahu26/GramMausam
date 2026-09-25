@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import {
   ArrowDown,
-  ArrowUp,
   CloudRain,
   Droplets,
   Gauge,
@@ -21,23 +20,21 @@ import {
   YAxis,
 } from "recharts";
 
-import { weatherByPanchayat } from "../data/mockData";
+import {
+  getForecast,
+  getPanchayats,
+  getWeather,
+} from "../services/weatherService";
 
-const forecast = [
-  { day: "Today", rainfall: 18, temp: 32, humidity: 78 },
-  { day: "25 Apr", rainfall: 12, temp: 34, humidity: 74 },
-  { day: "26 Apr", rainfall: 5, temp: 35, humidity: 69 },
-  { day: "27 Apr", rainfall: 9, temp: 33, humidity: 72 },
-  { day: "28 Apr", rainfall: 7, temp: 32, humidity: 70 },
-  { day: "29 Apr", rainfall: 6, temp: 34, humidity: 67 },
-  { day: "30 Apr", rainfall: 4, temp: 35, humidity: 64 },
+const parameters = [
+  "Rainfall",
+  "Temperature",
+  "Humidity",
 ];
-
-const parameters = ["Rainfall", "Temperature", "Humidity"];
 
 const chartKeys = {
   Rainfall: "rainfall",
-  Temperature: "temp",
+  Temperature: "max",
   Humidity: "humidity",
 };
 
@@ -49,10 +46,11 @@ const chartLabels = {
 
 export default function PanchayatDetails() {
   const [panchayat, setPanchayat] = useState("Bara");
-  const [activeParameter, setActiveParameter] = useState("Rainfall");
+  const [activeParameter, setActiveParameter] =
+    useState("Rainfall");
 
-  const weather =
-    weatherByPanchayat[panchayat] || weatherByPanchayat.Bara;
+  const weather = getWeather(panchayat);
+  const forecast = getForecast(panchayat);
 
   const selectedKey = chartKeys[activeParameter];
 
@@ -61,7 +59,7 @@ export default function PanchayatDetails() {
       day: item.day,
       value: item[selectedKey],
     }));
-  }, [selectedKey]);
+  }, [forecast, selectedKey]);
 
   return (
     <main className="mx-auto w-full max-w-[1700px] p-4 sm:p-6 xl:p-8">
@@ -93,10 +91,12 @@ export default function PanchayatDetails() {
 
           <select
             value={panchayat}
-            onChange={(e) => setPanchayat(e.target.value)}
+            onChange={(event) =>
+              setPanchayat(event.target.value)
+            }
             className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 outline-none transition focus:border-emerald-400"
           >
-            {Object.keys(weatherByPanchayat).map((name) => (
+            {getPanchayats().map((name) => (
               <option key={name} value={name}>
                 {name}
               </option>
@@ -107,12 +107,24 @@ export default function PanchayatDetails() {
 
       {/* Location strip */}
       <div className="mb-4 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-2xl border border-slate-200 bg-white px-4 py-3">
-        <LocationItem label="State" value="Uttar Pradesh" />
-        <LocationItem label="District" value="Prayagraj" />
-        <LocationItem label="Block" value="Phaphamau" />
+        <LocationItem
+          label="State"
+          value="Uttar Pradesh"
+        />
+
+        <LocationItem
+          label="District"
+          value="Prayagraj"
+        />
+
+        <LocationItem
+          label="Block"
+          value="Phaphamau"
+        />
 
         <div className="ml-auto flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5">
           <MapPin className="h-3.5 w-3.5 text-emerald-600" />
+
           <span className="text-[11px] font-semibold text-emerald-700">
             {panchayat} Panchayat
           </span>
@@ -190,9 +202,10 @@ export default function PanchayatDetails() {
             </div>
 
             <p className="mt-1 max-w-3xl text-xs leading-5 text-slate-500">
-              The prototype compares the coarse block forecast with a
-              finer Panchayat-level estimate. The real ML downscaling
-              engine will replace these demonstration values in Chunk 2.
+              The prototype compares the coarse block forecast with
+              a finer Panchayat-level estimate. The real ML
+              downscaling engine will replace these demonstration
+              values in Chunk 2.
             </p>
 
             <div className="mt-5 grid max-w-3xl gap-3 sm:grid-cols-[1fr_auto_1fr]">
@@ -239,12 +252,13 @@ export default function PanchayatDetails() {
                 <button
                   key={parameter}
                   type="button"
-                  onClick={() => setActiveParameter(parameter)}
-                  className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-[10px] font-medium transition ${
-                    activeParameter === parameter
+                  onClick={() =>
+                    setActiveParameter(parameter)
+                  }
+                  className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-[10px] font-medium transition ${activeParameter === parameter
                       ? "bg-emerald-700 text-white"
                       : "bg-slate-50 text-slate-500 hover:bg-slate-100"
-                  }`}
+                    }`}
                 >
                   {parameter}
                 </button>
@@ -253,7 +267,10 @@ export default function PanchayatDetails() {
           </div>
 
           <div className="mt-6 h-[320px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
               <LineChart data={chartData}>
                 <CartesianGrid
                   strokeDasharray="3 3"
@@ -337,17 +354,29 @@ export default function PanchayatDetails() {
 
             <RiskRow
               name="Heavy Rain"
-              status={weather.rainfall >= 25 ? "High" : "Moderate"}
+              status={
+                weather.rainfall >= 25
+                  ? "High"
+                  : "Moderate"
+              }
             />
 
             <RiskRow
               name="Waterlogging"
-              status={weather.rainfall >= 20 ? "Moderate" : "Low"}
+              status={
+                weather.rainfall >= 20
+                  ? "Moderate"
+                  : "Low"
+              }
             />
 
             <RiskRow
               name="Heat Stress"
-              status={weather.maxTemp >= 35 ? "Moderate" : "Low"}
+              status={
+                weather.maxTemp >= 35
+                  ? "Moderate"
+                  : "Low"
+              }
             />
           </section>
 
@@ -404,15 +433,19 @@ export default function PanchayatDetails() {
                 <th className="px-4 py-3 text-[10px] font-semibold text-slate-500">
                   Day
                 </th>
+
                 <th className="px-4 py-3 text-[10px] font-semibold text-slate-500">
                   Rainfall
                 </th>
+
                 <th className="px-4 py-3 text-[10px] font-semibold text-slate-500">
                   Temperature
                 </th>
+
                 <th className="px-4 py-3 text-[10px] font-semibold text-slate-500">
                   Humidity
                 </th>
+
                 <th className="px-4 py-3 text-[10px] font-semibold text-slate-500">
                   Weather
                 </th>
@@ -434,7 +467,7 @@ export default function PanchayatDetails() {
                   </td>
 
                   <td className="px-4 py-3 text-xs text-slate-600">
-                    {item.temp}°C
+                    {item.max}°C / {item.min}°C
                   </td>
 
                   <td className="px-4 py-3 text-xs text-slate-600">
@@ -452,7 +485,7 @@ export default function PanchayatDetails() {
                         <CloudRain className="h-3 w-3" />
                         Rain
                       </span>
-                    ) : item.temp >= 35 ? (
+                    ) : item.max >= 35 ? (
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-[9px] font-semibold text-amber-700">
                         <Thermometer className="h-3 w-3" />
                         Hot
@@ -484,7 +517,8 @@ export default function PanchayatDetails() {
 
             <p className="mt-1 text-[11px] leading-5 text-slate-500">
               Confidence indicates how strongly the current forecast
-              is supported by the available data and model conditions.
+              is supported by the available data and model
+              conditions.
             </p>
           </div>
 
@@ -575,22 +609,20 @@ function DownscaleBox({
 }) {
   return (
     <div
-      className={`rounded-xl border p-4 ${
-        highlighted
+      className={`rounded-xl border p-4 ${highlighted
           ? "border-emerald-200 bg-white"
           : "border-slate-200 bg-white"
-      }`}
+        }`}
     >
       <p className="text-[10px] text-slate-400">
         {label}
       </p>
 
       <p
-        className={`mt-1 text-xl font-bold ${
-          highlighted
+        className={`mt-1 text-xl font-bold ${highlighted
             ? "text-emerald-700"
             : "text-slate-800"
-        }`}
+          }`}
       >
         {value}
       </p>

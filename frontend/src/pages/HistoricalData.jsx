@@ -9,10 +9,8 @@ import {
   LineChart as LineChartIcon,
   MapPin,
   Target,
-  Thermometer,
 } from "lucide-react";
 import {
-  Bar,
   CartesianGrid,
   ComposedChart,
   Legend,
@@ -23,6 +21,18 @@ import {
   YAxis,
 } from "recharts";
 
+import {
+  getEvaluationMetrics,
+  getHistoricalData,
+  getRainEventMetrics,
+} from "../services/historicalService";
+
+const parameters = [
+  "Rainfall",
+  "Temperature",
+  "Humidity",
+];
+
 const panchayats = [
   "Bara",
   "Kareli",
@@ -31,202 +41,18 @@ const panchayats = [
   "Jasra",
 ];
 
-const parameterData = {
-  Rainfall: [
-    {
-      date: "18 Apr",
-      observation: 22,
-      blockForecast: 19,
-      downscaled: 21,
-    },
-    {
-      date: "19 Apr",
-      observation: 14,
-      blockForecast: 18,
-      downscaled: 15,
-    },
-    {
-      date: "20 Apr",
-      observation: 31,
-      blockForecast: 25,
-      downscaled: 29,
-    },
-    {
-      date: "21 Apr",
-      observation: 8,
-      blockForecast: 12,
-      downscaled: 9,
-    },
-    {
-      date: "22 Apr",
-      observation: 17,
-      blockForecast: 21,
-      downscaled: 18,
-    },
-    {
-      date: "23 Apr",
-      observation: 26,
-      blockForecast: 22,
-      downscaled: 24,
-    },
-    {
-      date: "24 Apr",
-      observation: 18,
-      blockForecast: 20,
-      downscaled: 18,
-    },
-  ],
-
-  Temperature: [
-    {
-      date: "18 Apr",
-      observation: 31.4,
-      blockForecast: 30.8,
-      downscaled: 31.2,
-    },
-    {
-      date: "19 Apr",
-      observation: 32.1,
-      blockForecast: 31.5,
-      downscaled: 31.9,
-    },
-    {
-      date: "20 Apr",
-      observation: 33.6,
-      blockForecast: 34.1,
-      downscaled: 33.7,
-    },
-    {
-      date: "21 Apr",
-      observation: 30.8,
-      blockForecast: 31.7,
-      downscaled: 31.0,
-    },
-    {
-      date: "22 Apr",
-      observation: 32.9,
-      blockForecast: 32.1,
-      downscaled: 32.7,
-    },
-    {
-      date: "23 Apr",
-      observation: 34.2,
-      blockForecast: 33.4,
-      downscaled: 34.0,
-    },
-    {
-      date: "24 Apr",
-      observation: 32.0,
-      blockForecast: 32.7,
-      downscaled: 32.2,
-    },
-  ],
-
-  Humidity: [
-    {
-      date: "18 Apr",
-      observation: 74,
-      blockForecast: 70,
-      downscaled: 73,
-    },
-    {
-      date: "19 Apr",
-      observation: 72,
-      blockForecast: 68,
-      downscaled: 71,
-    },
-    {
-      date: "20 Apr",
-      observation: 81,
-      blockForecast: 77,
-      downscaled: 80,
-    },
-    {
-      date: "21 Apr",
-      observation: 69,
-      blockForecast: 72,
-      downscaled: 70,
-    },
-    {
-      date: "22 Apr",
-      observation: 77,
-      blockForecast: 73,
-      downscaled: 76,
-    },
-    {
-      date: "23 Apr",
-      observation: 82,
-      blockForecast: 78,
-      downscaled: 81,
-    },
-    {
-      date: "24 Apr",
-      observation: 78,
-      blockForecast: 74,
-      downscaled: 77,
-    },
-  ],
-};
-
-const metricsByParameter = {
-  Rainfall: {
-    blockMae: "6.4 mm",
-    downscaledMae: "3.9 mm",
-    blockRmse: "8.1 mm",
-    downscaledRmse: "5.2 mm",
-    improvement: "Illustrative",
-  },
-
-  Temperature: {
-    blockMae: "1.2°C",
-    downscaledMae: "0.7°C",
-    blockRmse: "1.5°C",
-    downscaledRmse: "0.9°C",
-    improvement: "Illustrative",
-  },
-
-  Humidity: {
-    blockMae: "6.1%",
-    downscaledMae: "3.8%",
-    blockRmse: "7.4%",
-    downscaledRmse: "4.9%",
-    improvement: "Illustrative",
-  },
-};
-
-const confusionData = [
-  {
-    label: "Rain Event Detected",
-    precision: "82%",
-    recall: "79%",
-    f1: "80%",
-  },
-  {
-    label: "No Significant Rain",
-    precision: "86%",
-    recall: "88%",
-    f1: "87%",
-  },
-];
-
 export default function HistoricalData() {
   const [panchayat, setPanchayat] = useState("Bara");
-  const [parameter, setParameter] = useState("Rainfall");
+  const [parameter, setParameter] =
+    useState("Rainfall");
   const [period, setPeriod] = useState("7 Days");
 
   const chartData = useMemo(() => {
-    if (period === "3 Days") {
-      return parameterData[parameter].slice(-3);
-    }
-
-    if (period === "30 Days") {
-      return buildExtendedData(parameter);
-    }
-
-    return parameterData[parameter];
+    return getHistoricalData(parameter, period);
   }, [parameter, period]);
 
-  const metrics = metricsByParameter[parameter];
+  const metrics = getEvaluationMetrics(parameter);
+  const rainMetrics = getRainEventMetrics();
 
   return (
     <main className="mx-auto w-full max-w-[1700px] p-4 sm:p-6 xl:p-8">
@@ -246,8 +72,9 @@ export default function HistoricalData() {
         </h1>
 
         <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-500">
-          Review historical weather patterns and compare coarse
-          block-level forecasts with localized Panchayat estimates.
+          Review historical weather patterns and compare
+          coarse block-level forecasts with localized
+          Panchayat estimates.
         </p>
       </div>
 
@@ -264,7 +91,7 @@ export default function HistoricalData() {
           <Filter
             label="Parameter"
             value={parameter}
-            options={Object.keys(parameterData)}
+            options={parameters}
             onChange={setParameter}
           />
 
@@ -277,7 +104,7 @@ export default function HistoricalData() {
         </div>
       </section>
 
-      {/* Location summary */}
+      {/* Location information */}
       <section className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-2xl border border-slate-200 bg-white px-5 py-4">
         <LocationItem
           icon={MapPin}
@@ -330,7 +157,7 @@ export default function HistoricalData() {
           </div>
 
           <div className="flex rounded-xl bg-slate-50 p-1">
-            {Object.keys(parameterData).map((item) => (
+            {parameters.map((item) => (
               <button
                 key={item}
                 type="button"
@@ -445,7 +272,7 @@ export default function HistoricalData() {
         </div>
       </section>
 
-      {/* Metrics */}
+      {/* Evaluation cards */}
       <section className="mt-4">
         <div className="mb-3 flex items-center gap-2">
           <Target className="h-5 w-5 text-emerald-600" />
@@ -456,7 +283,8 @@ export default function HistoricalData() {
             </h2>
 
             <p className="text-[10px] text-slate-400">
-              Example validation metrics for the selected parameter
+              Example validation metrics for the selected
+              parameter.
             </p>
           </div>
         </div>
@@ -500,7 +328,7 @@ export default function HistoricalData() {
         </div>
       </section>
 
-      {/* Comparison */}
+      {/* Comparison table */}
       <section className="mt-4 rounded-2xl border border-slate-200 bg-white p-5">
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
           <div>
@@ -567,7 +395,7 @@ export default function HistoricalData() {
         </div>
       </section>
 
-      {/* Rain event evaluation */}
+      {/* Rain event metrics */}
       <section className="mt-4 grid gap-4 xl:grid-cols-[1fr_1fr]">
         <section className="rounded-2xl border border-slate-200 bg-white p-5">
           <div className="flex items-center gap-2">
@@ -579,7 +407,7 @@ export default function HistoricalData() {
               </h2>
 
               <p className="text-[10px] text-slate-400">
-                Example classification metrics
+                Example classification metrics.
               </p>
             </div>
           </div>
@@ -607,7 +435,7 @@ export default function HistoricalData() {
               </thead>
 
               <tbody>
-                {confusionData.map((row) => (
+                {rainMetrics.map((row) => (
                   <tr
                     key={row.label}
                     className="border-t border-slate-100"
@@ -671,7 +499,7 @@ export default function HistoricalData() {
         </section>
       </section>
 
-      {/* Download */}
+      {/* Export */}
       <section className="mt-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-sm font-bold text-slate-800">
@@ -679,8 +507,8 @@ export default function HistoricalData() {
           </h2>
 
           <p className="mt-1 text-[10px] text-slate-400">
-            Exported historical data will come from the backend
-            once the data pipeline is implemented.
+            Export functionality will use backend-generated
+            historical data once the data pipeline is connected.
           </p>
         </div>
 
@@ -716,7 +544,9 @@ function Filter({
 
       <select
         value={value}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={(event) =>
+          onChange(event.target.value)
+        }
         className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-800 outline-none focus:border-emerald-400"
       >
         {options.map((option) => (
@@ -857,50 +687,4 @@ function InfoStep({
       </div>
     </div>
   );
-}
-
-function buildExtendedData(parameter) {
-  const base = parameterData[parameter];
-
-  const extraData = [
-    {
-      date: "02 Apr",
-      observation: base[0].observation + 2,
-      blockForecast: base[0].blockForecast + 1,
-      downscaled: base[0].downscaled + 1,
-    },
-    {
-      date: "05 Apr",
-      observation: base[1].observation - 1,
-      blockForecast: base[1].blockForecast + 2,
-      downscaled: base[1].downscaled,
-    },
-    {
-      date: "08 Apr",
-      observation: base[2].observation + 3,
-      blockForecast: base[2].blockForecast + 1,
-      downscaled: base[2].downscaled + 2,
-    },
-    {
-      date: "11 Apr",
-      observation: base[3].observation + 1,
-      blockForecast: base[3].blockForecast - 1,
-      downscaled: base[3].downscaled,
-    },
-    {
-      date: "14 Apr",
-      observation: base[4].observation - 2,
-      blockForecast: base[4].blockForecast,
-      downscaled: base[4].downscaled - 1,
-    },
-    {
-      date: "17 Apr",
-      observation: base[5].observation + 1,
-      blockForecast: base[5].blockForecast - 1,
-      downscaled: base[5].downscaled,
-    },
-    ...base,
-  ];
-
-  return extraData;
 }
